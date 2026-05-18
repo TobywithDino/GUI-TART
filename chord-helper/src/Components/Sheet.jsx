@@ -4,19 +4,30 @@ import LyricForm from "./LyricForm";
 import Lyric from "./Lyric";
 import ChordSlide from "./ChordSlide";
 
+const estimateWidth = (v) => v.length * 12 + 16;
+
+function buildInitialChords(values) {
+  let x = 0;
+  return values.map((v) => {
+    const chord = { id: Math.random(), value: v, x };
+    x += estimateWidth(v) + 4;
+    return chord;
+  });
+}
+
 function Sheet() {
   const [lyrics, setLyric] = useState([
     {
       content: "記得那天太陽壓著平原 風慢慢吹 沒有人掉眼淚",
       isEditing: false,
       id: Math.random(),
-      chords: ["Am", "C"],
+      chords: buildInitialChords(["Am", "C"]),
     },
     {
       content: "一切好美 好到我可以不用說話",
       isEditing: false,
       id: Math.random(),
-      chords: ["D", "G"],
+      chords: buildInitialChords(["D", "G"]),
     },
   ]);
 
@@ -37,11 +48,27 @@ function Sheet() {
     ]);
   };
 
-  const addChord = (lyricId, chord) => {
+  const addChord = (lyricId, chordValue, initialX = 0) => {
     setLyric(
       lyrics.map((lyric) =>
         lyric.id === lyricId
-          ? { ...lyric, chords: [...lyric.chords, chord] }
+          ? {
+              ...lyric,
+              chords: [
+                ...lyric.chords,
+                { id: Math.random(), value: chordValue, x: initialX },
+              ],
+            }
+          : lyric,
+      ),
+    );
+  };
+
+  const deleteChord = (lyricId, chordId) => {
+    setLyric(
+      lyrics.map((lyric) =>
+        lyric.id === lyricId
+          ? { ...lyric, chords: lyric.chords.filter((c) => c.id !== chordId) }
           : lyric,
       ),
     );
@@ -67,13 +94,18 @@ function Sheet() {
       <div className="sheet">
         {lyrics.map((lyric) => {
           return (
-            <div>
-              <ChordSlide chords={lyric.chords} />
+            <div key={lyric.id}>
+              <ChordSlide
+                lyric={lyric}
+                chords={lyric.chords}
+                addChord={addChord}
+                deleteChord={deleteChord}
+              />
               <Lyric
-                key={lyric.id}
                 lyric={lyric}
                 toggleIsEditing={toggleIsEditing}
                 editLyric={editLyric}
+                deleteLyric={deleteLyric}
               />
             </div>
           );

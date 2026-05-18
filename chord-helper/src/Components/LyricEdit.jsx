@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function LyricEdit({ lyric, editLyric }) {
+function LyricEdit({ lyric, editLyric, deleteLyric }) {
   const [content, setContent] = useState(lyric.content);
 
   const handleSubmit = (e) => {
@@ -10,8 +10,13 @@ function LyricEdit({ lyric, editLyric }) {
     }
   };
 
+  const handleDelete = (e) => {
+    e.preventDefault();
+    deleteLyric(lyric.id);
+  };
+
   return (
-    <form className="lyrics-edit" onSubmit={handleSubmit}>
+    <form className="lyrics-edit">
       <input
         value={content}
         onChange={(e) => {
@@ -19,7 +24,8 @@ function LyricEdit({ lyric, editLyric }) {
         }}
         type="text"
       ></input>
-      <button>保存</button>
+      <button onClick={handleSubmit}>保存</button>
+      <button onClick={handleDelete}>刪除</button>
     </form>
   );
 }
